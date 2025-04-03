@@ -33,11 +33,12 @@ interface EquipmentProps {
       date: string | null;
     } | null;
   };
+  onClick?: () => void;
 }
 
-export function Equipment({ equipment }: EquipmentProps) {
+export function Equipment({ equipment, onClick }: EquipmentProps) {
   return (
-    <EquipmentContainer>
+    <EquipmentContainer onClick={onClick}>
       <EquipmentTitle>Equipamento: {equipment.name}</EquipmentTitle>
       <EquipmentModel>
         <strong>Modelo:</strong> {equipment.modelName}

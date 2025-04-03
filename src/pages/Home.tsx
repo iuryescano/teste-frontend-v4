@@ -6,7 +6,8 @@ import equipmentModelData from "../data/equipmentModel.json";
 import equipmentStateData from "../data/equipmentState.json";
 import equipmentStateHistory from "../data/equipmentStateHistory.json";
 import equipmentPositionHistory from "../data/equipmentPositionHistory.json";
-import { HomeContainer, Containt } from "./home.styles.ts";
+import { HomeContainer, Containt } from "./Home.styles.ts";
+import { Modal } from "../components/common/Modal"; 
 
 
 import { Button } from "../components/common/Button/index.tsx";
@@ -81,10 +82,22 @@ export function Home() {
       lastState: equipment.lastState,
     }));
 
+    const [selectedEquipment, setSelectedEquipment] = useState<ProcessedEquipment | null>(null);
+
+    const handleEquipmentClick = (equipment: ProcessedEquipment) => {
+      setSelectedEquipment(equipment); // Define o equipamento selecionado
+    };
+  
+    const closeModal = () => {
+      setSelectedEquipment(null); // Fecha o modal
+    };
+
   return (
     <HomeContainer>
       <header style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "2.5rem", color: "green" }}>Bem-vindo ao Painel de Equipamentos</h1>
+        <h1 style={{ fontSize: "2.5rem", color: "#00B37E", fontWeight: "bold", marginBottom: "0.8rem" }}>
+          Bem-vindo ao Painel de Equipamentos
+        </h1>
         <p style={{ fontSize: "1.2rem", color: "#555" }}>
           Visualize o status e a localização dos seus equipamentos em tempo real.
         </p>
@@ -100,18 +113,42 @@ export function Home() {
         {view === "map" && (
           <div>
             <h2>Mapa</h2>
-            <Map equipmentPositions={equipmentPositions} />
+            <Map
+              equipmentPositions={equipmentPositions}
+            />
           </div>
         )}
         {view === "cards" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <h2>Equipamentos</h2>
             {processedData.map((equipment) => (
-              <Equipment key={equipment.id} equipment={equipment} />
+              <Equipment
+                key={equipment.id}
+                equipment={equipment}
+                onClick={() => handleEquipmentClick(equipment)}
+              />
             ))}
           </div>
         )}
       </Containt>
+
+      {/* Modal para exibir o histórico de estados */}
+      {selectedEquipment && (
+        <Modal onClose={closeModal}>
+          <h2>Histórico de Estados - {selectedEquipment.name}</h2>
+          <ul>
+            {equipmentStateHistory
+              .find((history) => history.equipmentId === selectedEquipment.id)
+              ?.states.map((state, index) => (
+                <li key={index}>
+                  <strong>Data:</strong> {new Date(state.date).toLocaleString()} -{" "}
+                  <strong>Estado:</strong>{" "}
+                  {equipmentStateData.find((s) => s.id === state.equipmentStateId)?.name || "Desconhecido"}
+                </li>
+              ))}
+          </ul>
+        </Modal>
+      )}
     </HomeContainer>
   );
 }

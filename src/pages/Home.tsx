@@ -103,15 +103,18 @@ export function Home() {
         </p>
       </header>
 
+      <hr style={{ width: "50%", marginLeft: "25%", marginTop: "-1rem", opacity: "50%"}}/>
+
       {/* Botões para alternar entre mapa e cards */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", justifyContent: "center" }}>
         <Button onClick={() => setView("map")}>Ver Mapa</Button>
         <Button onClick={() => setView("cards")}>Ver Equipamentos</Button>
       </div>
+
       <Containt>
         {/* Renderização condicional */}
         {view === "map" && (
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "3rem"}}>
             <h2>Mapa</h2>
             <Map
               equipmentPositions={equipmentPositions}
@@ -132,7 +135,7 @@ export function Home() {
         )}
       </Containt>
 
-      {/* Modal para exibir o histórico de estados */}
+
       {selectedEquipment && (
         <Modal onClose={closeModal}>
           <h2>Histórico de Estados - {selectedEquipment.name}</h2>
@@ -154,66 +157,66 @@ export function Home() {
 }
 
 function processEquipmentData(
-  equipment: Equipment[],
-  equipmentModel: EquipmentModel[],
-  equipmentState: EquipmentState[],
-  equipmentStateHistory: { equipmentId: string; states: { date: string; equipmentStateId: string }[] }[],
-  equipmentPositionHistory: { equipmentId: string; positions: { date: string; lat: number; lon: number }[] }[]
-): ProcessedEquipment[] {
-  return equipment.map((equip) => {
-    // Encontrar o modelo do equipamento
-    const model = equipmentModel.find(
-      (model) => model.id === equip.equipmentModelId
-    );
-
-    // Mapear os ganhos por hora com os estados
-    const hourlyEarningsWithState = model?.hourlyEarnings.map((earning) => {
-      const state = equipmentState.find(
-        (state) => state.id === earning.equipmentStateId
+    equipment: Equipment[],
+    equipmentModel: EquipmentModel[],
+    equipmentState: EquipmentState[],
+    equipmentStateHistory: { equipmentId: string; states: { date: string; equipmentStateId: string }[] }[],
+    equipmentPositionHistory: { equipmentId: string; positions: { date: string; lat: number; lon: number }[] }[]
+    ): ProcessedEquipment[] {
+    return equipment.map((equip) => {
+      // Encontrar o modelo do equipamento
+      const model = equipmentModel.find(
+        (model) => model.id === equip.equipmentModelId
       );
+
+      // Mapear os ganhos por hora com os estados
+      const hourlyEarningsWithState = model?.hourlyEarnings.map((earning) => {
+        const state = equipmentState.find(
+          (state) => state.id === earning.equipmentStateId
+        );
+        return {
+          ...earning,
+          stateName: state?.name || "Estado desconhecido",
+          stateColor: state?.color || "#000000",
+        };
+      });
+
+      // Obter o último estado do equipamento
+      const stateHistory = equipmentStateHistory.find(
+        (history) => history.equipmentId === equip.id
+      );
+      const lastStateEntry = stateHistory?.states.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0];
+      const lastState = equipmentState.find(
+        (state) => state.id === lastStateEntry?.equipmentStateId
+      );
+
+      // Obter a última posição do equipamento
+      const positionHistory = equipmentPositionHistory.find(
+        (history) => history.equipmentId === equip.id
+      );
+      const lastPositionEntry = positionHistory?.positions.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )[0];
+
+      // Retornar o equipamento processado
       return {
-        ...earning,
-        stateName: state?.name || "Estado desconhecido",
-        stateColor: state?.color || "#000000",
+        ...equip,
+        modelName: model?.name || "Modelo desconhecido",
+        hourlyEarnings: hourlyEarningsWithState || [],
+        lastState: {
+          stateName: lastState?.name || "Estado desconhecido",
+          stateColor: lastState?.color || "#000000",
+          date: lastStateEntry?.date || null,
+        },
+        lastPosition: lastPositionEntry
+          ? {
+              lat: lastPositionEntry.lat,
+              lon: lastPositionEntry.lon,
+              date: lastPositionEntry.date,
+            }
+          : null,
       };
     });
-
-    // Obter o último estado do equipamento
-    const stateHistory = equipmentStateHistory.find(
-      (history) => history.equipmentId === equip.id
-    );
-    const lastStateEntry = stateHistory?.states.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )[0];
-    const lastState = equipmentState.find(
-      (state) => state.id === lastStateEntry?.equipmentStateId
-    );
-
-    // Obter a última posição do equipamento
-    const positionHistory = equipmentPositionHistory.find(
-      (history) => history.equipmentId === equip.id
-    );
-    const lastPositionEntry = positionHistory?.positions.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )[0];
-
-    // Retornar o equipamento processado
-    return {
-      ...equip,
-      modelName: model?.name || "Modelo desconhecido",
-      hourlyEarnings: hourlyEarningsWithState || [],
-      lastState: {
-        stateName: lastState?.name || "Estado desconhecido",
-        stateColor: lastState?.color || "#000000",
-        date: lastStateEntry?.date || null,
-      },
-      lastPosition: lastPositionEntry
-        ? {
-            lat: lastPositionEntry.lat,
-            lon: lastPositionEntry.lon,
-            date: lastPositionEntry.date,
-          }
-        : null,
-    };
-  });
 }

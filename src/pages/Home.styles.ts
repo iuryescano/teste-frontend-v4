@@ -5,6 +5,7 @@ export const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+
 `;
 
 export const Containt = styled.div`

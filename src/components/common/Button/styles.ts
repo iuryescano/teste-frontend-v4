@@ -17,4 +17,15 @@ export const ButtonContainer = styled.button`
     background: ${(props) => props.theme["gray-500"]};
     cursor: not-allowed;
   }
+  &:active {
+    background: ${(props) => props.theme["gray-500"]};
+    transform: scale(0.98);
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px ${(props) => props.theme["gray-500"]};
+  }
+  &:disabled:focus {
+    box-shadow: none;
+  }
 `;

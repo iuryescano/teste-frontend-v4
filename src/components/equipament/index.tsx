@@ -43,34 +43,34 @@ export function Equipment({ equipment, onClick }: EquipmentProps) {
       <EquipmentModel>
         <strong>Modelo:</strong> {equipment.modelName}
       </EquipmentModel>
+      <div style={{ marginBottom: "15px" }}>
+        {/* Último estado */}
+        {equipment.lastState && (
+          <LastState>
+            <strong>Último Estado:</strong>{" "}
+            <span style={{ color: equipment.lastState.stateColor }}>
+              {equipment.lastState.stateName}
+            </span>{" "}
+            {equipment.lastState.date && (
+              <em>({new Date(equipment.lastState.date).toLocaleString()})</em>
+            )}
+          </LastState>
+        )}
 
-      {/* Último estado */}
-      {equipment.lastState && (
-        <LastState>
-          <strong>Último Estado:</strong>{" "}
-          <span style={{ color: equipment.lastState.stateColor }}>
-            {equipment.lastState.stateName}
-          </span>{" "}
-          {equipment.lastState.date && (
-            <em>({new Date(equipment.lastState.date).toLocaleString()})</em>
-          )}
-        </LastState>
-      )}
-
-      {/* Última posição */}
-      {equipment.lastPosition && (
-        <LastPosition>
-          <strong>Última Posição:</strong>{" "}
-          <span>
-            Latitude: {equipment.lastPosition.lat}, Longitude:{" "}
-            {equipment.lastPosition.lon}
-          </span>{" "}
-          {equipment.lastPosition.date && (
-            <em>({new Date(equipment.lastPosition.date).toLocaleString()})</em>
-          )}
-        </LastPosition>
-      )}
-
+        {/* Última posição */}
+        {equipment.lastPosition && (
+          <LastPosition>
+            <strong>Última Posição:</strong>{" "}
+            <span>
+              Latitude: {equipment.lastPosition.lat}, Longitude:{" "}
+              {equipment.lastPosition.lon}
+            </span>{" "}
+            {equipment.lastPosition.date && (
+              <em>({new Date(equipment.lastPosition.date).toLocaleString()})</em>
+            )}
+          </LastPosition>
+        )}
+      </div>
       <EarningsTitle>Ganhos por Hora:</EarningsTitle>
       <EarningsList>
         {equipment.hourlyEarnings.map((earning) => (

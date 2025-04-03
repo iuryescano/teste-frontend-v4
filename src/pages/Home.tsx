@@ -6,6 +6,10 @@ import equipmentModelData from "../data/equipmentModel.json";
 import equipmentStateData from "../data/equipmentState.json";
 import equipmentStateHistory from "../data/equipmentStateHistory.json";
 import equipmentPositionHistory from "../data/equipmentPositionHistory.json";
+import { HomeContainer, Containt } from "./home.styles.ts";
+
+
+import { Button } from "../components/common/Button/index.tsx";
 
 // Interfaces para tipagem
 interface Equipment {
@@ -53,6 +57,7 @@ interface ProcessedEquipment extends Equipment {
 
 export function Home() {
   const [processedData, setProcessedData] = useState<ProcessedEquipment[]>([]);
+  const [view, setView] = useState<"map" | "cards">("map"); // Estado para alternar entre mapa e cards
 
   useEffect(() => {
     // Processar os dados ao carregar o componente
@@ -73,23 +78,41 @@ export function Home() {
       name: equipment.name,
       lat: equipment.lastPosition!.lat,
       lon: equipment.lastPosition!.lon,
+      lastState: equipment.lastState,
     }));
 
   return (
-    <div>
-      <h1>Home</h1>
-      {/* Mapa com as últimas posições */}
-      <div>
-        <Map equipmentPositions={equipmentPositions} />
+    <HomeContainer>
+      <header style={{ textAlign: "center", marginBottom: "2rem" }}>
+        <h1 style={{ fontSize: "2.5rem", color: "green" }}>Bem-vindo ao Painel de Equipamentos</h1>
+        <p style={{ fontSize: "1.2rem", color: "#555" }}>
+          Visualize o status e a localização dos seus equipamentos em tempo real.
+        </p>
+      </header>
+
+      {/* Botões para alternar entre mapa e cards */}
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem", justifyContent: "center" }}>
+        <Button onClick={() => setView("map")}>Ver Mapa</Button>
+        <Button onClick={() => setView("cards")}>Ver Equipamentos</Button>
       </div>
-      {/*
-      <div>
-        {processedData.map((equipment) => (
-          <Equipment key={equipment.id} equipment={equipment} />
-        ))}
-      </div>
-      */}
-    </div>
+      <Containt>
+        {/* Renderização condicional */}
+        {view === "map" && (
+          <div>
+            <h2>Mapa</h2>
+            <Map equipmentPositions={equipmentPositions} />
+          </div>
+        )}
+        {view === "cards" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <h2>Equipamentos</h2>
+            {processedData.map((equipment) => (
+              <Equipment key={equipment.id} equipment={equipment} />
+            ))}
+          </div>
+        )}
+      </Containt>
+    </HomeContainer>
   );
 }
 

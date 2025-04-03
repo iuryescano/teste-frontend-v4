@@ -1,12 +1,18 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Container } from "./styles";
+import { Tooltip } from "react-leaflet";
 
 interface EquipmentPosition {
   id: string;
   name: string;
   lat: number;
   lon: number;
+  lastState: {
+    stateName: string;
+    stateColor: string;
+    date: string | null;
+  }
 }
 
 interface MapProps {
@@ -23,12 +29,37 @@ export function Map({ equipmentPositions }: MapProps) {
         />
         {equipmentPositions.map((equipment) => (
           <Marker key={equipment.id} position={[equipment.lat, equipment.lon]}>
+            <Tooltip>
+              <strong>{equipment.name}</strong>
+              <br />
+              <span style={{ color: equipment.lastState.stateColor }}>
+                {equipment.lastState.stateName}
+              </span>
+            </Tooltip>
             <Popup>
               <strong>{equipment.name}</strong>
               <br />
-              Latitude: {equipment.lat}
+              <span>
+                <strong>Estado:</strong>{" "}
+                <span style={{ color: equipment.lastState.stateColor }}>
+                  {equipment.lastState.stateName}
+                </span>
+              </span>
               <br />
-              Longitude: {equipment.lon}
+              <span>
+                <strong>Data:</strong>{" "}
+                {equipment.lastState.date
+                  ? new Date(equipment.lastState.date).toLocaleString()
+                  : "Sem Data"}
+              </span>
+              <br />
+              <span>
+                <strong>Latitude:</strong> {equipment.lat}
+              </span>
+              <br />
+              <span>
+                <strong>Longitude:</strong> {equipment.lon}
+              </span>
             </Popup>
           </Marker>
         ))}
